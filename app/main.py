@@ -106,7 +106,45 @@ def main():
                             number += file_contents[i]
                 
                 print(f"NUMBER {number} {float(number)}")
-
+            elif c.isalpha() or c == "_":
+                word = c
+                while i + 1 < length and (file_contents[i + 1].isalnum() or file_contents[i + 1] == "_"):
+                    i += 1
+                    word += file_contents[i]
+                if word == "and":
+                    print("AND and null")
+                elif word == "class":
+                    print("CLASS class null")
+                elif word == "else":
+                    print("ELSE else null")
+                elif word == "false":
+                    print("FALSE false null")
+                elif word == "for":
+                    print("FOR for null")
+                elif word == "fun":
+                    print("FUN fun null")
+                elif word == "if":
+                    print("IF if null")
+                elif word == "nil":
+                    print("NIL nil null")
+                elif word == "or":
+                    print("OR or null")
+                elif word == "print":
+                    print("PRINT print null")
+                elif word == "return":
+                    print("RETURN return null")
+                elif word == "super":
+                    print("SUPER super null")
+                elif word == "this":
+                    print("THIS this null")
+                elif word == "true":
+                    print("TRUE true null")
+                elif word == "var":
+                    print("VAR var null")
+                elif word == "while":
+                    print("WHILE while null")
+                else:
+                    print(f"IDENTIFIER {word} null")
             else:
                 error = True
                 print(
