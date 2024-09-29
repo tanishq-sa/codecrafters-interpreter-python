@@ -25,9 +25,13 @@ def main():
             print("LEFT_PAREN ( null")
         elif c == ")":
             print("RIGHT_PAREN ) null")
+        elif c == "{":
+            print("LEFT_BRACE { null")
+        elif c == "}":
+            print("RIGHT_BRACE } null")
         else:
             print(f"Unrecognized TOKEN {c} null")
-            
+
     # Print EOF after processing the tokens
     print("EOF  null")
 
