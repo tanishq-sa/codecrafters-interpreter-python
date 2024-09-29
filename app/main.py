@@ -77,6 +77,20 @@ def main():
                         
                 else:
                     print("SLASH / null")
+            else c == '"':
+                word = ""
+                i += 1
+                while i < length and file_contents[i] != '"':
+                    if file_contents[i] == "\n":
+                        line += 1
+                    word += file_contents[i]
+                    i += 1
+                    if i >= length:
+                        error = True
+                        print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
+                        break
+                print(f"STRING {word} null")
+
             else:
                 error = True
                 print(
