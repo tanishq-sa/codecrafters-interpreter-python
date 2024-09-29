@@ -164,7 +164,8 @@ def tokenize(file_contents):
                 i += 1
             if i == length:
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
-                tokens.append(Token("EOF", "", "null", line))  # Ensure EOF is still appended
+                tokens.append(Token("EOF", "", "null", line))
+                sys.exit(65)  # Ensure EOF is still appended
                 return tokens  # Exit early after error
             else:
                 tokens.append(Token("STRING", f'"{word}"', word, line))
