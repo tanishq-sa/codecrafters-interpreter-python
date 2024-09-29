@@ -62,7 +62,9 @@ def scan(file_contents):
                     i += 1
                 else:
                     print("GREATER > null")
-            case " " or "\r" or "\t" or "\n" or "\v" or "\f":
+            case " ":
+                pass
+            case "\t":
                 pass
             case _:
                 error_code = 65
