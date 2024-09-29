@@ -89,7 +89,7 @@ def main():
                         error = True
                         print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                         break
-                print(f"STRING "{word}" {word}")
+                print(f'STRING "{word}" {word}')
 
             else:
                 error = True
