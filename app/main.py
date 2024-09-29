@@ -1,8 +1,15 @@
 import sys
+
 error_code = 0
+
 def scan(file_contents):
     global error_code
-    for syntas in file_contents:
+    length = len(file_contents)
+
+    i = 0
+    while i < length:
+        syntas = file_contents[i]
+
         match syntas:
             case "(":
                 print("LEFT_PAREN ( null")
@@ -27,41 +34,48 @@ def scan(file_contents):
             case "/":
                 print("SLASH / null")
             case "=":
-                if syntas < len(file_contents) - 1 and file_contents[syntas + 1] == "=":
+                # Check if the next character is also "=" for "=="
+                if i < length - 1 and file_contents[i + 1] == "=":
                     print("EQUAL_EQUAL == null")
+                    i += 1  # Skip the next character as it's part of the "=="
                 else:
                     print("EQUAL = null")
-
             case _:
                 error_code = 65
-                line_number = (
-                    file_contents.count("\n", 0, file_contents.find(syntas)) + 1
-                )
+                line_number = file_contents.count("\n", 0, i) + 1
                 print(
                     f"[line {line_number}] Error: Unexpected character: {syntas}",
                     file=sys.stderr,
                 )
+
+        i += 1
+
 def main():
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
+    # Debug print statement
     print("Logs from your program will appear here!", file=sys.stderr)
+
     if len(sys.argv) < 3:
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
         exit(1)
+
     command = sys.argv[1]
     filename = sys.argv[2]
+
     if command != "tokenize":
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
+
     with open(filename) as file:
         file_contents = file.read()
-    # Uncomment this block to pass the first stage
+
+    # Process file contents if not empty
     if file_contents:
         scan(file_contents)
         print("EOF  null")
         exit(error_code)
     else:
-        print(
-            "EOF  null"
-        )  # Placeholder, remove this line when implementing the scanner
+        print("EOF  null")
+        exit(0)
+
 if __name__ == "__main__":
     main()
