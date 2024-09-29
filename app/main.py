@@ -102,7 +102,7 @@ def tokenize(file_contents):
         c = file_contents[i]
         if c == "\n":
             line += 1
-        elif c in (" ", "\r", "\t"):
+        elif c == " " or c == "\r" or c == "\t":
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
@@ -151,6 +151,7 @@ def tokenize(file_contents):
         elif c == "/":
             if i + 1 < length and file_contents[i + 1] == "/":
                 i += 1
+                line += 1
                 while i < length and file_contents[i] != "\n":
                     i += 1
             else:
@@ -159,8 +160,6 @@ def tokenize(file_contents):
             word = ""
             i += 1
             while i < length and file_contents[i] != '"':
-                if file_contents[i] == "\n":  # Handle newlines within strings
-                    line += 1
                 word += file_contents[i]
                 i += 1
             if i == length:
@@ -216,9 +215,6 @@ def tokenize(file_contents):
                 tokens.append(Token("IDENTIFIER", word, "null", line))
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
-            for token in tokens:
-                print(f"{token.type} {token.lexeme} {token.literal}")
-            sys.exit(65)  # Exit on unexpected character
         i += 1
     tokens.append(Token("EOF", "", "null", line))
     return tokens
@@ -230,7 +226,6 @@ def main():
         exit(1)
     command = sys.argv[1]
     filename = sys.argv[2]
-
     if command not in ["tokenize", "parse"]:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
@@ -245,10 +240,11 @@ def main():
     elif command == "parse":
         tokens = tokenize(file_contents)
         parser = Parser(tokens)
-        expressions = parser.parse()
-        print("\nParsed expressions:")
-        for expression in expressions:
-            print(expression)
+        ast = parser.parse()
+        
+        # Print the parsed expressions correctly
+        for statement in ast:
+            print(statement)  # This will print each parsed expression
 
 
 if __name__ == "__main__":
