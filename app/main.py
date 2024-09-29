@@ -26,9 +26,11 @@ def scan(file_contents):
                 print("SEMICOLON ; null")
             case "/":
                 print("SLASH / null")
+            case "==":
+                print("EQUAL_EQUAL == null")
             case "=":
                 print("EQUAL = null")
-                
+
             case _:
                 error_code = 65
                 line_number = (
