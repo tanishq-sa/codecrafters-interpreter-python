@@ -33,11 +33,16 @@ def scan(file_contents):
                 print("SEMICOLON ; null")
             case "/":
                 print("SLASH / null")
+            case "!":
+                if i < length - 1 and file_contents[i + 1] == "=":
+                    print("BANG_EQUAL != null")
+                    i += 1
+                else:
+                    print("BANG ! null")
             case "=":
-                # Check if the next character is also "=" for "=="
                 if i < length - 1 and file_contents[i + 1] == "=":
                     print("EQUAL_EQUAL == null")
-                    i += 1  # Skip the next character as it's part of the "=="
+                    i += 1 
                 else:
                     print("EQUAL = null")
             case _:
