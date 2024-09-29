@@ -105,8 +105,10 @@ def tokenize(file_contents):
     tokens = []
     length = len(file_contents)
     i = 0
+    
     while i < length:
         c = file_contents[i]
+        
         if c == "\n":
             line += 1
         elif c in {" ", "\r", "\t"}:
@@ -114,7 +116,7 @@ def tokenize(file_contents):
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
         elif c == ")":
-            tokens.append(Token("RIGHT_PAREN", ")", "null", line))
+            tokens.append(Token("RIGHT_PAREN", ")", "null", line))  # Ensure this is here
         elif c == "{":
             tokens.append(Token("LEFT_BRACE", "{", "null", line))
         elif c == "}":
@@ -228,6 +230,7 @@ def tokenize(file_contents):
     
     tokens.append(Token("EOF", "", "null", line))
     return tokens
+
 
 def main():
     if len(sys.argv) < 3:
