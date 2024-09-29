@@ -208,7 +208,7 @@ def tokenize(file_contents):
             }
             if word in keywords:
                 tokens.append(Token(keywords[word], word, "null", line))
-            else
+            else:  # Fixed the missing colon here
                 tokens.append(Token("IDENTIFIER", word, "null", line))
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
