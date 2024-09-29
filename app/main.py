@@ -20,10 +20,14 @@ def main():
         file_contents = file.read()
 
     # Uncomment this block to pass the first stage
-    if file_contents:
-        raise NotImplementedError("Scanner not implemented")
-    else:
-        print("EOF  null") # Placeholder, remove this line when implementing the scanner
+    for c in files_contents:
+        if c == "(":
+            print("LEFT_PAREN ( null")
+        elif c == ")":
+            print("RIGHT_PAREN ) null")
+        else:
+            print(f"Unrecognized TOKEN {c} null")
+        print ("EOF null")
 
 
 if __name__ == "__main__":
