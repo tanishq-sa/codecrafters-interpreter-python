@@ -16,8 +16,45 @@ class Parser:
     def parse(self):
         expressions = []
         while not self.is_at_end():
-            expressions.append(self.expression())
+            expressions.append(self.statement())
         return expressions
+
+    def statement(self):
+        if self.match("VAR"):
+            return self.var_declaration()
+        elif self.match("IF"):
+            return self.if_statement()
+        # Add more statement types here as needed
+        raise Exception("Expected statement.")
+
+    def var_declaration(self):
+        name = self.consume("IDENTIFIER", "Expected variable name.")
+        self.consume("EQUAL", "Expected '=' after variable name.")
+        initializer = self.expression()
+        self.consume("SEMICOLON", "Expected ';' after variable declaration.")
+        return f"var {name.lexeme} = {initializer};"
+
+    def if_statement(self):
+        self.consume("LEFT_PAREN", "Expected '(' after 'if'.")
+        condition = self.expression()
+        self.consume("RIGHT_PAREN", "Expected ')' after condition.")
+        self.consume("LEFT_BRACE", "Expected '{' before body.")
+        then_branch = self.block()
+        self.consume("RIGHT_BRACE", "Expected '}' after body.")
+        
+        else_branch = None
+        if self.match("ELSE"):
+            self.consume("LEFT_BRACE", "Expected '{' before else body.")
+            else_branch = self.block()
+            self.consume("RIGHT_BRACE", "Expected '}' after else body.")
+
+        return f"if ({condition}) {{ {then_branch} }} else {{ {else_branch} }}"
+
+    def block(self):
+        statements = []
+        while not self.is_at_end() and not self.check("RIGHT_BRACE"):
+            statements.append(self.statement())
+        return " ".join(statements)
 
     def expression(self):
         return self.equality()
@@ -72,6 +109,11 @@ class Parser:
                 self.advance()
                 return True
         return False
+
+    def consume(self, type_, message):
+        if self.check(type_):
+            return self.advance()
+        raise Exception(message)
 
     def check(self, type_):
         if self.is_at_end():
@@ -168,7 +210,6 @@ def tokenize(file_contents):
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 tokens.append(Token("EOF", "", "null", line))
                 sys.exit(65)
-                return tokens
             
             i += 1  # Skip the closing quote
             tokens.append(Token("STRING", f'"{word}"', word, line))
@@ -212,43 +253,32 @@ def tokenize(file_contents):
                 "var": "VAR",
                 "while": "WHILE",
             }
-            if word in keywords:
-                tokens.append(Token(keywords[word], word, "null", line))
-            else:
-                tokens.append(Token("IDENTIFIER", word, "null", line))
+            tokens.append(Token(keywords.get(word, "IDENTIFIER"), word, "null", line))
         else:
-            print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
+            print(f"[line {line}] Error: Unexpected character '{c}'.", file=sys.stderr)
+            sys.exit(65)
+
         i += 1
-    
+
     tokens.append(Token("EOF", "", "null", line))
     return tokens
 
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: ./your_program.sh tokenize|parse <filename>", file=sys.stderr)
-        exit(1)
-    command = sys.argv[1]
-    filename = sys.argv[2]
-    if command not in ["tokenize", "parse"]:
-        print(f"Unknown command: {command}", file=sys.stderr)
-        exit(1)
+    if len(sys.argv) < 2:
+        print("Usage: python parser.py <source_file>")
+        return
 
-    with open(filename) as file:
+    source_file = sys.argv[1]
+    
+    with open(source_file, "r") as file:
         file_contents = file.read()
 
-    if command == "tokenize":
-        tokens = tokenize(file_contents)
-        for token in tokens:
-            print(f"{token.type} {token.lexeme} {token.literal}")
-    elif command == "parse":
-        tokens = tokenize(file_contents)
-        parser = Parser(tokens)
-        ast = parser.parse()
-        
-        # Print the parsed expressions correctly
-        for statement in ast:
-            print(statement)  # This will print each parsed expression
+    tokens = tokenize(file_contents)
+    parser = Parser(tokens)
+    statements = parser.parse()
+    for statement in statements:
+        print(statement)
 
 
 if __name__ == "__main__":
