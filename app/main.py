@@ -89,7 +89,7 @@ def main():
                 else:
                     print(f'STRING "{word}" {word}')
             elif c.isdigit():
-                float number = c
+                number = c
                 while i + 1 < length and file_contents[i + 1].isdigit():
                     i += 1
                     number += file_contents[i]
