@@ -37,6 +37,8 @@ def main():
             print("STAR * null")
         elif c == "+":
             print("PLUS + null")
+        elif c == "-":
+            print("MINUS - null")
         else:
             print(f"Unrecognized TOKEN {c} null")
 
