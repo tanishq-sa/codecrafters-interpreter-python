@@ -113,16 +113,12 @@ def tokenize(file_contents):
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
-            # print(f"Tokenized LEFT_PAREN on line {line}")  # Debug
         elif c == ")":
             tokens.append(Token("RIGHT_PAREN", ")", "null", line))
-            # print(f"Tokenized RIGHT_PAREN on line {line}")  # Debug
         elif c == "{":
             tokens.append(Token("LEFT_BRACE", "{", "null", line))
-            # print(f"Tokenized LEFT_BRACE on line {line}")  # Debug
         elif c == "}":
             tokens.append(Token("RIGHT_BRACE", "}", "null", line))
-            # print(f"Tokenized RIGHT_BRACE on line {line}")  # Debug
         elif c == ",":
             tokens.append(Token("COMMA", ",", "null", line))
         elif c == ";":
@@ -232,7 +228,6 @@ def tokenize(file_contents):
     
     tokens.append(Token("EOF", "", "null", line))
     return tokens
-
 
 def main():
     if len(sys.argv) < 3:
