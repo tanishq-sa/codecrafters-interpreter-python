@@ -165,7 +165,7 @@ def tokenize(file_contents):
             if i == length:
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
             else:
-                tokens.append(Token("STRING", word, word, line))
+                tokens.append(Token("STRING", f'"{word}"', word, line))
         elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
             number = c
             if c == '.':
