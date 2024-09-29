@@ -26,6 +26,7 @@ def main():
         if c == "\n":
             line += 1
         elif c == " " or c == "\r" or c == "\t":
+            # Skip whitespace, but do not increment the line number here
             pass
         elif c == "(":
             print("LEFT_PAREN ( null")
@@ -79,7 +80,7 @@ def main():
             else:
                 print("SLASH / null")
         else:
-            # Unexpected character error handling
+            # Handling unexpected characters and displaying correct line number
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
             error = True
 
