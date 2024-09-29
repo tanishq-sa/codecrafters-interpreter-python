@@ -169,8 +169,6 @@ def tokenize(file_contents):
                 sys.exit(65)
             else:
                 tokens.append(Token("STRING", f'"{word}"', word, line))
-            else:
-                tokens.append(Token("STRING", f'"{word}"', word, line))
         elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
             number = c
             if c == '.':
