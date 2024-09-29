@@ -100,7 +100,6 @@ class Parser:
     def previous(self):
         return self.tokens[self.current - 1]
 
-
 def tokenize(file_contents):
     line = 1
     tokens = []
@@ -114,13 +113,16 @@ def tokenize(file_contents):
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
+            # print(f"Tokenized LEFT_PAREN on line {line}")  # Debug
         elif c == ")":
             tokens.append(Token("RIGHT_PAREN", ")", "null", line))
-            print(f"Tokenized RIGHT_PAREN on line {line}")  # Debug
+            # print(f"Tokenized RIGHT_PAREN on line {line}")  # Debug
         elif c == "{":
             tokens.append(Token("LEFT_BRACE", "{", "null", line))
+            # print(f"Tokenized LEFT_BRACE on line {line}")  # Debug
         elif c == "}":
             tokens.append(Token("RIGHT_BRACE", "}", "null", line))
+            # print(f"Tokenized RIGHT_BRACE on line {line}")  # Debug
         elif c == ",":
             tokens.append(Token("COMMA", ",", "null", line))
         elif c == ";":
