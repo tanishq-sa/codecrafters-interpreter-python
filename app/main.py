@@ -11,6 +11,10 @@ def scan(file_contents):
         syntas = file_contents[i]
 
         match syntas:
+            case " ":
+                pass
+            case "\t":
+                pass
             case "/":
                 if i < length - 1 and file_contents[i + 1] == "/":
                     i += 1
@@ -62,10 +66,6 @@ def scan(file_contents):
                     i += 1
                 else:
                     print("GREATER > null")
-            case " ":
-                print("SPACE \\s null")
-            case "\t":
-                print("TAB \\t null")
             case _:
                 error_code = 65
                 line_number = file_contents.count("\n", 0, i) + 1
