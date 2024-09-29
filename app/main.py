@@ -20,7 +20,7 @@ def main():
         file_contents = file.read()
 
     # Uncomment this block to pass the first stage
-    for c in files_contents:
+    for c in file_contents:
         if c == "(":
             print("LEFT_PAREN ( null")
         elif c == ")":
