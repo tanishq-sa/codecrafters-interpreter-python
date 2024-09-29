@@ -45,9 +45,9 @@ def main():
             print("SEMICOLON ; null")
         else:
             error = True
-            line = file_contents.count("\n", 0, file_contents.find(c)) + 1
+            line_no = file_contents.count("\n", 0, file_contents.find(c)) + 1
             print(
-                "[line %s] Error: Unexpected character: %s" % (line_number, token),
+                "[line %s] Error: Unexpected character: %s" % (line_no, token),
                 file=sys.stderr,
             )
 
