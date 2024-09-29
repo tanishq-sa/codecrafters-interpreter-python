@@ -105,49 +105,49 @@ def tokenize(file_contents):
         elif c == " " or c == "\r" or c == "\t":
             pass
         elif c == "(":
-            tokens.append(Token("LEFT_PAREN", "(", None, line))
+            tokens.append(Token("LEFT_PAREN", "(", "null", line))
         elif c == ")":
-            tokens.append(Token("RIGHT_PAREN", ")", None, line))
+            tokens.append(Token("RIGHT_PAREN", ")", "null", line))
         elif c == "{":
-            tokens.append(Token("LEFT_BRACE", "{", None, line))
+            tokens.append(Token("LEFT_BRACE", "{", "null", line))
         elif c == "}":
-            tokens.append(Token("RIGHT_BRACE", "}", None, line))
+            tokens.append(Token("RIGHT_BRACE", "}", "null", line))
         elif c == ",":
-            tokens.append(Token("COMMA", ",", None, line))
+            tokens.append(Token("COMMA", ",", "null", line))
         elif c == ";":
-            tokens.append(Token("SEMICOLON", ";", None, line))
+            tokens.append(Token("SEMICOLON", ";", "null", line))
         elif c == ".":
-            tokens.append(Token("DOT", ".", None, line))
+            tokens.append(Token("DOT", ".", "null", line))
         elif c == "-":
-            tokens.append(Token("MINUS", "-", None, line))
+            tokens.append(Token("MINUS", "-", "null", line))
         elif c == "+":
-            tokens.append(Token("PLUS", "+", None, line))
+            tokens.append(Token("PLUS", "+", "null", line))
         elif c == "*":
-            tokens.append(Token("STAR", "*", None, line))
+            tokens.append(Token("STAR", "*", "null", line))
         elif c == "=":
             if i + 1 < length and file_contents[i + 1] == "=":
                 i += 1
-                tokens.append(Token("EQUAL_EQUAL", "==", None, line))
+                tokens.append(Token("EQUAL_EQUAL", "==", "null", line))
             else:
-                tokens.append(Token("EQUAL", "=", None, line))
+                tokens.append(Token("EQUAL", "=", "null", line))
         elif c == "!":
             if i + 1 < length and file_contents[i + 1] == "=":
                 i += 1
-                tokens.append(Token("BANG_EQUAL", "!=", None, line))
+                tokens.append(Token("BANG_EQUAL", "!=", "null", line))
             else:
-                tokens.append(Token("BANG", "!", None, line))
+                tokens.append(Token("BANG", "!", "null", line))
         elif c == "<":
             if i + 1 < length and file_contents[i + 1] == "=":
                 i += 1
-                tokens.append(Token("LESS_EQUAL", "<=", None, line))
+                tokens.append(Token("LESS_EQUAL", "<=", "null", line))
             else:
-                tokens.append(Token("LESS", "<", None, line))
+                tokens.append(Token("LESS", "<", "null", line))
         elif c == ">":
             if i + 1 < length and file_contents[i + 1] == "=":
                 i += 1
-                tokens.append(Token("GREATER_EQUAL", ">=", None, line))
+                tokens.append(Token("GREATER_EQUAL", ">=", "null", line))
             else:
-                tokens.append(Token("GREATER", ">", None, line))
+                tokens.append(Token("GREATER", ">", "null", line))
         elif c == "/":
             if i + 1 < length and file_contents[i + 1] == "/":
                 i += 1
@@ -155,7 +155,7 @@ def tokenize(file_contents):
                 while i < length and file_contents[i] != "\n":
                     i += 1
             else:
-                tokens.append(Token("SLASH", "/", None, line))
+                tokens.append(Token("SLASH", "/", "null", line))
         elif c == '"':
             word = ""
             i += 1
@@ -213,7 +213,7 @@ def tokenize(file_contents):
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
         i += 1
-    tokens.append(Token("EOF", "", None, line))
+    tokens.append(Token("EOF", "", "null", line))
     return tokens
 
 
