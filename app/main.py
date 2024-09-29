@@ -77,7 +77,7 @@ class Parser:
     def match(self, *types):
         for type_ in types:
             if self.check(type_):
-                print(f"Matched {type_}")  # Debug print for token matching
+                print(f"{type_}")  # Debug print for token matching
                 self.advance()
                 return True
         return False
