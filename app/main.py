@@ -88,11 +88,23 @@ def main():
                     print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 else:
                     print(f'STRING "{word}" {word}')
-            elif c.isdigit():
+            elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
                 number = c
-                while i + 1 < length and file_contents[i + 1].isdigit():
-                    i += 1
-                    number += file_contents[i]
+                if c == '.':
+                    while i + 1 < length and file_contents[i + 1].isdigit():
+                        i += 1
+                        number += file_contents[i]
+                else:
+                    while i + 1 < length and file_contents[i + 1].isdigit():
+                        i += 1
+                        number += file_contents[i]
+                    if i + 1 < length and file_contents[i + 1] == '.':
+                        i += 1 
+                        number += '.'
+                        while i + 1 < length and file_contents[i + 1].isdigit():
+                            i += 1
+                            number += file_contents[i]
+                
                 print(f"NUMBER {number} {float(number)}")
 
             else:
