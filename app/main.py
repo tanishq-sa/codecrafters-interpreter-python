@@ -114,7 +114,6 @@ def tokenize(file_contents):
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
-            print(f"Tokenized LEFT_PAREN on line {line}")  # Debug
         elif c == ")":
             tokens.append(Token("RIGHT_PAREN", ")", "null", line))
             print(f"Tokenized RIGHT_PAREN on line {line}")  # Debug
