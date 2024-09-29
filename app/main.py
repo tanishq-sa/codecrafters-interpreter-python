@@ -45,6 +45,18 @@ def scan(file_contents):
                     i += 1 
                 else:
                     print("EQUAL = null")
+            case "<":
+                if i < length - 1 and file_contents[i + 1] == "=":
+                    print("LESS_EQUAL <= null")
+                    i += 1
+                else:
+                    print("LESS < null")
+            case ">":
+                if i < length - 1 and file_contents[i + 1] == "=":
+                    print("GREATER_EQUAL >= null")
+                    i += 1
+                else:
+                    print("GREATER > null")
             case _:
                 error_code = 65
                 line_number = file_contents.count("\n", 0, i) + 1
