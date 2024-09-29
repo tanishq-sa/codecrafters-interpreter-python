@@ -7,6 +7,92 @@ class Token:
         self.literal = literal
         self.line = line
 
+
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.current = 0
+
+    def parse(self):
+        expressions = []
+        while not self.is_at_end():
+            expressions.append(self.expression())
+        return expressions
+
+    def expression(self):
+        return self.equality()
+
+    def equality(self):
+        expr = self.addition()
+        while self.match("BANG_EQUAL", "EQUAL_EQUAL"):
+            operator = self.previous()
+            right = self.addition()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def addition(self):
+        expr = self.multiplication()
+        while self.match("PLUS", "MINUS"):
+            operator = self.previous()
+            right = self.multiplication()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def multiplication(self):
+        expr = self.unary()
+        while self.match("STAR", "SLASH"):
+            operator = self.previous()
+            right = self.unary()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def unary(self):
+        if self.match("BANG", "MINUS"):
+            operator = self.previous()
+            right = self.unary()
+            return f"({operator.lexeme} {right})"
+        return self.primary()
+
+    def primary(self):
+        if self.match("NUMBER", "STRING"):
+            return self.previous().literal
+        if self.match("TRUE"):
+            return "true"
+        if self.match("FALSE"):
+            return "false"
+        if self.match("NIL"):
+            return "nil"
+        if self.match("IDENTIFIER"):
+            return self.previous().lexeme
+        raise Exception("Expected expression.")
+
+    def match(self, *types):
+        for type_ in types:
+            if self.check(type_):
+                self.advance()
+                return True
+        return False
+
+    def check(self, type_):
+        if self.is_at_end():
+            return False
+        return self.peek().type == type_
+
+    def advance(self):
+        if not self.is_at_end():
+            self.current += 1
+        return self.previous()
+
+    def is_at_end(self):
+        return self.peek().type == "EOF"
+
+    def peek(self):
+        return self.tokens[self.current]
+
+    def previous(self):
+        return self.tokens[self.current - 1]
+
+
 def tokenize(file_contents):
     line = 1
     tokens = []
@@ -16,7 +102,7 @@ def tokenize(file_contents):
         c = file_contents[i]
         if c == "\n":
             line += 1
-        elif c == " " or c == "\r" or c == "\t":
+        elif c in {" ", "\r", "\t"}:
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
@@ -65,7 +151,6 @@ def tokenize(file_contents):
         elif c == "/":
             if i + 1 < length and file_contents[i + 1] == "/":
                 i += 1
-                line += 1
                 while i < length and file_contents[i] != "\n":
                     i += 1
             else:
@@ -74,16 +159,19 @@ def tokenize(file_contents):
             word = ""
             i += 1
             while i < length and file_contents[i] != '"':
-                if file_contents[i] == '\n':
-                    line += 1  # count newlines in strings
+                if file_contents[i] == "\n":  # Handle new lines in strings
+                    line += 1
                 word += file_contents[i]
                 i += 1
-            if i == length:
+            
+            if i == length:  # End of file reached without a closing quote
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
-                # Don't append any token for an unterminated string; handle it below.
-                return tokens  # Exit early after error
-            else:
-                tokens.append(Token("STRING", f'"{word}"', word, line))
+                tokens.append(Token("EOF", "", "null", line))
+                sys.exit(65)
+                return tokens
+            
+            i += 1  # Skip the closing quote
+            tokens.append(Token("STRING", f'"{word}"', word, line))
         elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
             number = c
             if c == '.':
@@ -95,7 +183,7 @@ def tokenize(file_contents):
                     i += 1
                     number += file_contents[i]
                 if i + 1 < length and file_contents[i + 1] == '.':
-                    i += 1 
+                    i += 1
                     number += '.'
                     while i + 1 < length and file_contents[i + 1].isdigit():
                         i += 1
@@ -131,7 +219,7 @@ def tokenize(file_contents):
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
         i += 1
-
+    
     tokens.append(Token("EOF", "", "null", line))
     return tokens
 
