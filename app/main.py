@@ -1,159 +1,245 @@
 import sys
+
+class Token:
+    def __init__(self, type_, lexeme, literal, line):
+        self.type = type_
+        self.lexeme = lexeme
+        self.literal = literal
+        self.line = line
+
+
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.current = 0
+
+    def parse(self):
+        expressions = []
+        while not self.is_at_end():
+            expressions.append(self.expression())
+        return expressions
+
+    def expression(self):
+        return self.equality()
+
+    def equality(self):
+        expr = self.addition()
+        while self.match("BANG_EQUAL", "EQUAL_EQUAL"):
+            operator = self.previous()
+            right = self.addition()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def addition(self):
+        expr = self.multiplication()
+        while self.match("PLUS", "MINUS"):
+            operator = self.previous()
+            right = self.multiplication()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def multiplication(self):
+        expr = self.unary()
+        while self.match("STAR", "SLASH"):
+            operator = self.previous()
+            right = self.unary()
+            expr = f"({operator.lexeme} {expr} {right})"
+        return expr
+
+    def unary(self):
+        if self.match("BANG", "MINUS"):
+            operator = self.previous()
+            right = self.unary()
+            return f"({operator.lexeme} {right})"
+        return self.primary()
+
+    def primary(self):
+        if self.match("NUMBER", "STRING"):
+            return self.previous().literal
+        if self.match("TRUE"):
+            return "true"
+        if self.match("FALSE"):
+            return "false"
+        if self.match("NIL"):
+            return "nil"
+        if self.match("IDENTIFIER"):
+            return self.previous().lexeme
+        raise Exception("Expected expression.")
+
+    def match(self, *types):
+        for type_ in types:
+            if self.check(type_):
+                self.advance()
+                return True
+        return False
+
+    def check(self, type_):
+        if self.is_at_end():
+            return False
+        return self.peek().type == type_
+
+    def advance(self):
+        if not self.is_at_end():
+            self.current += 1
+        return self.previous()
+
+    def is_at_end(self):
+        return self.peek().type == "EOF"
+
+    def peek(self):
+        return self.tokens[self.current]
+
+    def previous(self):
+        return self.tokens[self.current - 1]
+
+
+def tokenize(file_contents):
+    line = 1
+    tokens = []
+    length = len(file_contents)
+    i = 0
+    while i < length:
+        c = file_contents[i]
+        if c == "\n":
+            line += 1
+        elif c == " " or c == "\r" or c == "\t":
+            pass
+        elif c == "(":
+            tokens.append(Token("LEFT_PAREN", "(", None, line))
+        elif c == ")":
+            tokens.append(Token("RIGHT_PAREN", ")", None, line))
+        elif c == "{":
+            tokens.append(Token("LEFT_BRACE", "{", None, line))
+        elif c == "}":
+            tokens.append(Token("RIGHT_BRACE", "}", None, line))
+        elif c == ",":
+            tokens.append(Token("COMMA", ",", None, line))
+        elif c == ";":
+            tokens.append(Token("SEMICOLON", ";", None, line))
+        elif c == ".":
+            tokens.append(Token("DOT", ".", None, line))
+        elif c == "-":
+            tokens.append(Token("MINUS", "-", None, line))
+        elif c == "+":
+            tokens.append(Token("PLUS", "+", None, line))
+        elif c == "*":
+            tokens.append(Token("STAR", "*", None, line))
+        elif c == "=":
+            if i + 1 < length and file_contents[i + 1] == "=":
+                i += 1
+                tokens.append(Token("EQUAL_EQUAL", "==", None, line))
+            else:
+                tokens.append(Token("EQUAL", "=", None, line))
+        elif c == "!":
+            if i + 1 < length and file_contents[i + 1] == "=":
+                i += 1
+                tokens.append(Token("BANG_EQUAL", "!=", None, line))
+            else:
+                tokens.append(Token("BANG", "!", None, line))
+        elif c == "<":
+            if i + 1 < length and file_contents[i + 1] == "=":
+                i += 1
+                tokens.append(Token("LESS_EQUAL", "<=", None, line))
+            else:
+                tokens.append(Token("LESS", "<", None, line))
+        elif c == ">":
+            if i + 1 < length and file_contents[i + 1] == "=":
+                i += 1
+                tokens.append(Token("GREATER_EQUAL", ">=", None, line))
+            else:
+                tokens.append(Token("GREATER", ">", None, line))
+        elif c == "/":
+            if i + 1 < length and file_contents[i + 1] == "/":
+                i += 1
+                line += 1
+                while i < length and file_contents[i] != "\n":
+                    i += 1
+            else:
+                tokens.append(Token("SLASH", "/", None, line))
+        elif c == '"':
+            word = ""
+            i += 1
+            while i < length and file_contents[i] != '"':
+                word += file_contents[i]
+                i += 1
+            if i == length:
+                print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
+            else:
+                tokens.append(Token("STRING", word, word, line))
+        elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
+            number = c
+            if c == '.':
+                while i + 1 < length and file_contents[i + 1].isdigit():
+                    i += 1
+                    number += file_contents[i]
+            else:
+                while i + 1 < length and file_contents[i + 1].isdigit():
+                    i += 1
+                    number += file_contents[i]
+                if i + 1 < length and file_contents[i + 1] == '.':
+                    i += 1 
+                    number += '.'
+                    while i + 1 < length and file_contents[i + 1].isdigit():
+                        i += 1
+                        number += file_contents[i]
+            tokens.append(Token("NUMBER", number, float(number), line))
+        elif c.isalpha() or c == "_":
+            word = c
+            while i + 1 < length and (file_contents[i + 1].isalnum() or file_contents[i + 1] == "_"):
+                i += 1
+                word += file_contents[i]
+            keywords = {
+                "and": "AND",
+                "class": "CLASS",
+                "else": "ELSE",
+                "false": "FALSE",
+                "for": "FOR",
+                "fun": "FUN",
+                "if": "IF",
+                "nil": "NIL",
+                "or": "OR",
+                "print": "PRINT",
+                "return": "RETURN",
+                "super": "SUPER",
+                "this": "THIS",
+                "true": "TRUE",
+                "var": "VAR",
+                "while": "WHILE",
+            }
+            if word in keywords:
+                tokens.append(Token(keywords[word], word, None, line))
+            else:
+                tokens.append(Token("IDENTIFIER", word, None, line))
+        else:
+            print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
+        i += 1
+    tokens.append(Token("EOF", "", None, line))
+    return tokens
+
+
 def main():
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    # print("Logs from your program will appear here!", file=sys.stderr)
     if len(sys.argv) < 3:
-        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
+        print("Usage: ./your_program.sh tokenize|parse <filename>", file=sys.stderr)
         exit(1)
     command = sys.argv[1]
     filename = sys.argv[2]
-    if command != "tokenize":
+    if command not in ["tokenize", "parse"]:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
+
     with open(filename) as file:
         file_contents = file.read()
-    # Uncomment this block to pass the first stage
-    line = 1
-    error = False
-    length = len(file_contents)
-    i = 0
-    if file_contents:
-        while i < length:
-            c = file_contents[i]
-            if c == "\n":
-                line += 1
-            elif c == " " or c == "\r" or c == "\t":
-                pass
-            elif c == "(":
-                print("LEFT_PAREN ( null")
-            elif c == ")":
-                print("RIGHT_PAREN ) null")
-            elif c == "{":
-                print("LEFT_BRACE { null")
-            elif c == "}":
-                print("RIGHT_BRACE } null")
-            elif c == ",":
-                print("COMMA , null")
-            elif c == ";":
-                print("SEMICOLON ; null")
-            elif c == ".":
-                print("DOT . null")
-            elif c == "-":
-                print("MINUS - null")
-            elif c == "+":
-                print("PLUS + null")
-            elif c == "*":
-                print("STAR * null")
-            elif c == "=":
-                if i + 1 < length and file_contents[i + 1] == "=":
-                    i += 1
-                    print("EQUAL_EQUAL == null")
-                else:
-                    print("EQUAL = null")
-            elif c == "!":
-                if i + 1 < length and file_contents[i + 1] == "=":
-                    i += 1
-                    print("BANG_EQUAL != null")
-                else:
-                    print("BANG ! null")
-            elif c == "<":
-                if i + 1 < length and file_contents[i + 1] == "=":
-                    i += 1
-                    print("LESS_EQUAL <= null")
-                else:
-                    print("LESS < null")
-            elif c == ">":
-                if i + 1 < length and file_contents[i + 1] == "=":
-                    i += 1
-                    print("GREATER_EQUAL >= null")
-                else:
-                    print("GREATER > null")
-            elif c == "/":
-                if i + 1 < length and file_contents[i + 1] == "/":
-                    i += 1
-                    line += 1
-                    while i < length and file_contents[i] != "\n":
-                        i += 1
-                        
-                else:
-                    print("SLASH / null")
-            elif c == '"':
-                word = ""
-                i += 1
-                while i < length and file_contents[i] != '"':
-                    word += file_contents[i]
-                    i += 1
-                if i == length:
-                    error = True
-                    print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
-                else:
-                    print(f'STRING "{word}" {word}')
-            elif c.isdigit() or (c == '.' and (i + 1 < length and file_contents[i + 1].isdigit())):
-                number = c
-                if c == '.':
-                    while i + 1 < length and file_contents[i + 1].isdigit():
-                        i += 1
-                        number += file_contents[i]
-                else:
-                    while i + 1 < length and file_contents[i + 1].isdigit():
-                        i += 1
-                        number += file_contents[i]
-                    if i + 1 < length and file_contents[i + 1] == '.':
-                        i += 1 
-                        number += '.'
-                        while i + 1 < length and file_contents[i + 1].isdigit():
-                            i += 1
-                            number += file_contents[i]
-                
-                print(f"NUMBER {number} {float(number)}")
-            elif c.isalpha() or c == "_":
-                word = c
-                while i + 1 < length and (file_contents[i + 1].isalnum() or file_contents[i + 1] == "_"):
-                    i += 1
-                    word += file_contents[i]
-                if word == "and":
-                    print("AND and null")
-                elif word == "class":
-                    print("CLASS class null")
-                elif word == "else":
-                    print("ELSE else null")
-                elif word == "false":
-                    print("FALSE false null")
-                elif word == "for":
-                    print("FOR for null")
-                elif word == "fun":
-                    print("FUN fun null")
-                elif word == "if":
-                    print("IF if null")
-                elif word == "nil":
-                    print("NIL nil null")
-                elif word == "or":
-                    print("OR or null")
-                elif word == "print":
-                    print("PRINT print null")
-                elif word == "return":
-                    print("RETURN return null")
-                elif word == "super":
-                    print("SUPER super null")
-                elif word == "this":
-                    print("THIS this null")
-                elif word == "true":
-                    print("TRUE true null")
-                elif word == "var":
-                    print("VAR var null")
-                elif word == "while":
-                    print("WHILE while null")
-                else:
-                    print(f"IDENTIFIER {word} null")
-            else:
-                error = True
-                print(
-                    f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr
-                )
-            i += 1
-    print("EOF  null")
-    if error:
-        exit(65)
-    exit(0)
+
+    if command == "tokenize":
+        tokens = tokenize(file_contents)
+        for token in tokens:
+            print(f"{token.type} {token.lexeme} {token.literal}")
+    elif command == "parse":
+        tokens = tokenize(file_contents)
+        parser = Parser(tokens)
+        ast = parser.parse()
+        for statement in ast:
+            print(statement)
+
 if __name__ == "__main__":
     main()
