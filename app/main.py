@@ -7,49 +7,17 @@ class Token:
         self.literal = literal
         self.line = line
 
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
 
     def parse(self):
-        statements = []
+        expressions = []
         while not self.is_at_end():
-            statements.append(self.statement())
-        return statements
-
-    def statement(self):
-        if self.match("IF"):
-            return self.if_statement()
-        # Additional statement types can be added here
-        raise Exception("Expected statement.")
-
-    def if_statement(self):
-        self.consume("LEFT_PAREN", "Expect '(' after 'if'.")
-        condition = self.expression()
-        self.consume("RIGHT_PAREN", "Expect ')' after condition.")
-        self.consume("LEFT_BRACE", "Expect '{' before statement.")
-        
-        then_branch = []
-        while not self.check("RIGHT_BRACE") and not self.is_at_end():
-            then_branch.append(self.statement())
-
-        self.consume("RIGHT_BRACE", "Expect '}' after block.")
-        
-        else_branch = None
-        if self.match("ELSE"):
-            self.consume("LEFT_BRACE", "Expect '{' after 'else'.")
-            else_branch = []
-            while not self.check("RIGHT_BRACE") and not self.is_at_end():
-                else_branch.append(self.statement())
-            self.consume("RIGHT_BRACE", "Expect '}' after else block.")
-
-        return {
-            "type": "if",
-            "condition": condition,
-            "then": then_branch,
-            "else": else_branch
-        }
+            expressions.append(self.expression())
+        return expressions
 
     def expression(self):
         return self.equality()
@@ -123,6 +91,7 @@ class Parser:
 
     def previous(self):
         return self.tokens[self.current - 1]
+
 
 def tokenize(file_contents):
     line = 1
@@ -199,6 +168,7 @@ def tokenize(file_contents):
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 tokens.append(Token("EOF", "", "null", line))
                 sys.exit(65)
+                return tokens
             
             i += 1  # Skip the closing quote
             tokens.append(Token("STRING", f'"{word}"', word, line))
@@ -247,32 +217,25 @@ def tokenize(file_contents):
             else:
                 tokens.append(Token("IDENTIFIER", word, "null", line))
         else:
-            print(f"[line {line}] Error: Unexpected character: '{c}'", file=sys.stderr)
-            tokens.append(Token("EOF", "", "null", line))
-            sys.exit(65)
+            print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
         i += 1
+    
     tokens.append(Token("EOF", "", "null", line))
     return tokens
 
+
 def main():
-    if len(sys.argv) < 3:  # Change to check for at least 3 arguments
+    if len(sys.argv) < 3:
         print("Usage: ./your_program.sh tokenize|parse <filename>", file=sys.stderr)
         exit(1)
-
-    command = sys.argv[1]  # This should remain as is
-    filename = sys.argv[2]  # This is now correctly pointing to the filename
-
+    command = sys.argv[1]
+    filename = sys.argv[2]
     if command not in ["tokenize", "parse"]:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
 
-    # Read the input file
-    try:
-        with open(filename, 'r') as file:  # Use filename correctly
-            file_contents = file.read()
-    except FileNotFoundError:
-        print(f"Error: File not found: {filename}", file=sys.stderr)
-        exit(1)
+    with open(filename) as file:
+        file_contents = file.read()
 
     if command == "tokenize":
         tokens = tokenize(file_contents)
@@ -282,11 +245,11 @@ def main():
         tokens = tokenize(file_contents)
         parser = Parser(tokens)
         ast = parser.parse()
-
+        
         # Print the parsed expressions correctly
         for statement in ast:
             print(statement)  # This will print each parsed expression
-        print(stmt)
+
 
 if __name__ == "__main__":
     main()
