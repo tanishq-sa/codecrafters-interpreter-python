@@ -102,7 +102,7 @@ def tokenize(file_contents):
         c = file_contents[i]
         if c == "\n":
             line += 1
-        elif c == " " or c == "\r" or c == "\t":
+        elif c in (" ", "\r", "\t"):
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
@@ -151,7 +151,6 @@ def tokenize(file_contents):
         elif c == "/":
             if i + 1 < length and file_contents[i + 1] == "/":
                 i += 1
-                line += 1
                 while i < length and file_contents[i] != "\n":
                     i += 1
             else:
@@ -160,12 +159,14 @@ def tokenize(file_contents):
             word = ""
             i += 1
             while i < length and file_contents[i] != '"':
+                if file_contents[i] == "\n":  # Handle newlines within strings
+                    line += 1
                 word += file_contents[i]
                 i += 1
             if i == length:
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 for token in tokens:
-                    print(f"{token.token_type} {token.lexeme} {token.literal}")
+                    print(f"{token.type} {token.lexeme} {token.literal}")
                 sys.exit(65)
             else:
                 tokens.append(Token("STRING", f'"{word}"', word, line))
@@ -211,10 +212,13 @@ def tokenize(file_contents):
             }
             if word in keywords:
                 tokens.append(Token(keywords[word], word, "null", line))
-            else:  # Fixed the missing colon here
+            else:
                 tokens.append(Token("IDENTIFIER", word, "null", line))
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
+            for token in tokens:
+                print(f"{token.type} {token.lexeme} {token.literal}")
+            sys.exit(65)  # Exit on unexpected character
         i += 1
     tokens.append(Token("EOF", "", "null", line))
     return tokens
@@ -226,6 +230,7 @@ def main():
         exit(1)
     command = sys.argv[1]
     filename = sys.argv[2]
+
     if command not in ["tokenize", "parse"]:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
@@ -240,9 +245,11 @@ def main():
     elif command == "parse":
         tokens = tokenize(file_contents)
         parser = Parser(tokens)
-        ast = parser.parse()
-        for statement in ast:
-            print(statement)
+        expressions = parser.parse()
+        print("\nParsed expressions:")
+        for expression in expressions:
+            print(expression)
+
 
 if __name__ == "__main__":
     main()
