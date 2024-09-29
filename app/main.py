@@ -255,10 +255,11 @@ def tokenize(file_contents):
     return tokens
 
 def main():
+    print(sys.argv)
     if len(sys.argv) < 2:
         print("Usage: lox.py <script>")
         sys.exit(64)
-    
+
     with open(sys.argv[1], 'r') as file:
         file_contents = file.read()
     
