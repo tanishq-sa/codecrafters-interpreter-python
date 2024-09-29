@@ -27,7 +27,9 @@ def main():
             print("RIGHT_PAREN ) null")
         else:
             print(f"Unrecognized TOKEN {c} null")
-    print ("EOF null")
+            
+    # Print EOF after processing the tokens
+    print("EOF  null")
 
 
 if __name__ == "__main__":
