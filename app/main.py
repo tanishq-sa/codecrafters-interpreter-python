@@ -61,8 +61,9 @@ def scan(file_contents):
                     print("GREATER_EQUAL >= null")
                     i += 1
                 else:
+                    print("GREATER > null")
             case "\t":
-                print("TAB \\t null")
+                pass
             case " ":
                 pass
             case _:
