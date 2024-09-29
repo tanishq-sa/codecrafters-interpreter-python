@@ -9,6 +9,7 @@ from .utils import RuntimeError
 def main():
     args = parse_args()
     args.entry(args)
+    # print(args)
 
 def parse_args() -> Namespace:
     arg_parser = ArgumentParser()
