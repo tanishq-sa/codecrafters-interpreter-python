@@ -88,6 +88,12 @@ def main():
                     print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 else:
                     print(f'STRING "{word}" {word}')
+            elif c.isdigit():
+                number = c
+                while i + 1 < length and file_contents[i + 1].isdigit():
+                    i += 1
+                    number += file_contents[i]
+                print(f"NUMBER {number} {number}")
 
             else:
                 error = True
