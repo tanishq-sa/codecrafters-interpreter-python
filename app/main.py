@@ -255,19 +255,37 @@ def tokenize(file_contents):
     return tokens
 
 def main():
-    print(sys.argv)
-    if len(sys.argv) < 2:
-        print("Usage: lox.py <script>")
-        sys.exit(64)
+    if len(sys.argv) < 3:  # Change to check for at least 3 arguments
+        print("Usage: ./your_program.sh tokenize|parse <filename>", file=sys.stderr)
+        exit(1)
 
-    with open(sys.argv[1], 'r') as file:
-        file_contents = file.read()
-    
-    tokens = tokenize(file_contents)
-    parser = Parser(tokens)
-    statements = parser.parse()
-    
-    for stmt in statements:
+    command = sys.argv[1]  # This should remain as is
+    filename = sys.argv[2]  # This is now correctly pointing to the filename
+
+    if command not in ["tokenize", "parse"]:
+        print(f"Unknown command: {command}", file=sys.stderr)
+        exit(1)
+
+    # Read the input file
+    try:
+        with open(filename, 'r') as file:  # Use filename correctly
+            file_contents = file.read()
+    except FileNotFoundError:
+        print(f"Error: File not found: {filename}", file=sys.stderr)
+        exit(1)
+
+    if command == "tokenize":
+        tokens = tokenize(file_contents)
+        for token in tokens:
+            print(f"{token.type} {token.lexeme} {token.literal}")
+    elif command == "parse":
+        tokens = tokenize(file_contents)
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Print the parsed expressions correctly
+        for statement in ast:
+            print(statement)  # This will print each parsed expression
         print(stmt)
 
 if __name__ == "__main__":
