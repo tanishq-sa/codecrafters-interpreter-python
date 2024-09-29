@@ -57,6 +57,13 @@ def scan(file_contents):
                     i += 1
                 else:
                     print("GREATER > null")
+            case "/"
+                if i < length - 1 and file_contents[i + 1] == "/":
+                    i += 1
+                    while i < length and file_contents[i] != "\n":
+                        i += 1
+                else:
+                    print("SLASH / null")
             case _:
                 error_code = 65
                 line_number = file_contents.count("\n", 0, i) + 1
