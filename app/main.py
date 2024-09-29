@@ -63,7 +63,7 @@ def scan(file_contents):
                 else:
                     print("GREATER > null")
             case " ":
-                pass
+                print("SPACE \\s null")
             case "\t":
                 print("TAB \\t null")
             case _:
