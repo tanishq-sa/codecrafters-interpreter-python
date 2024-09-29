@@ -1,6 +1,5 @@
 import sys
 
-
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
@@ -43,6 +42,9 @@ def main():
             print("MINUS - null")
         elif c == ";":
             print("SEMICOLON ; null")
+        # Ignore whitespaces (spaces, tabs, newlines)
+        elif c in " \t\n\r":
+            continue
         else:
             error = True
             line_no = file_contents.count("\n", 0, file_contents.find(c)) + 1
