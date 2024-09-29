@@ -85,7 +85,7 @@ def main():
                         line += 1
                     word += file_contents[i]
                     i += 1
-                    if i >= length:
+                    if i == length:
                         error = True
                         print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                         break
