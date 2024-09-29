@@ -13,10 +13,14 @@ class Parser:
         self.current = 0
 
     def parse(self):
-        expressions = []
-        while not self.is_at_end():
-            expressions.append(self.expression())
-        return expressions
+        try:
+            expressions = []
+            while not self.is_at_end():
+                expressions.append(self.expression())
+            return expressions
+        except Exception as e:
+            print(f"Parse error at token {self.peek().lexeme}: {e}", file=sys.stderr)
+            raise e
 
     def expression(self):
         return self.equality()
@@ -73,6 +77,7 @@ class Parser:
     def match(self, *types):
         for type_ in types:
             if self.check(type_):
+                print(f"Matched {type_}")  # Debug print for token matching
                 self.advance()
                 return True
         return False
@@ -110,8 +115,10 @@ def tokenize(file_contents):
             pass
         elif c == "(":
             tokens.append(Token("LEFT_PAREN", "(", "null", line))
+            print(f"Tokenized LEFT_PAREN on line {line}")  # Debug
         elif c == ")":
             tokens.append(Token("RIGHT_PAREN", ")", "null", line))
+            print(f"Tokenized RIGHT_PAREN on line {line}")  # Debug
         elif c == "{":
             tokens.append(Token("LEFT_BRACE", "{", "null", line))
         elif c == "}":
@@ -172,7 +179,6 @@ def tokenize(file_contents):
                 print(f"[line {line}] Error: Unterminated string.", file=sys.stderr)
                 tokens.append(Token("EOF", "", "null", line))
                 sys.exit(65)
-                return tokens
             
             i += 1  # Skip the closing quote
             tokens.append(Token("STRING", f'"{word}"', word, line))
