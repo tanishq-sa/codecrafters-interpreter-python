@@ -64,6 +64,8 @@ def scan(file_contents):
                     print("GREATER > null")
             case " ":
                 pass
+            case "    ":
+                pass
             case _:
                 error_code = 65
                 line_number = file_contents.count("\n", 0, i) + 1
