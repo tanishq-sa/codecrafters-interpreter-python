@@ -47,8 +47,13 @@ def main():
             continue
         else:
             error = True
-            line_no = file_contents.count("\n", 0, file_contents.find(c)) + 1
-            print(f"[line {line_no}] Error: Unexpected character: {c} ", file=sys.stderr)
+                line_number = (
+                    file_contents.count("\n", 0, file_contents.find(syntas)) + 1
+                )
+                print(
+                    f"[line {line_number}] Error: Unexpected character: {syntas}",
+                    file=sys.stderr,
+                )
 
     # Print EOF after processing the tokens
     print("EOF  null")
