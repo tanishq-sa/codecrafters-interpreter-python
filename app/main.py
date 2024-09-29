@@ -65,7 +65,7 @@ def scan(file_contents):
             case " ":
                 pass
             case "\t":
-                pass
+                print("TAB \\t null")
             case _:
                 error_code = 65
                 line_number = file_contents.count("\n", 0, i) + 1
