@@ -207,9 +207,9 @@ def tokenize(file_contents):
                 "while": "WHILE",
             }
             if word in keywords:
-                tokens.append(Token(keywords[word], word, null, line))
-            else:
-                tokens.append(Token("IDENTIFIER", word, null, line))
+                tokens.append(Token(keywords[word], word, "null", line))
+            else
+                tokens.append(Token("IDENTIFIER", word, "null", line))
         else:
             print(f"[line {line}] Error: Unexpected character: {c}", file=sys.stderr)
         i += 1
