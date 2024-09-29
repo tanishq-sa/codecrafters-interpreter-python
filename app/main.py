@@ -77,7 +77,7 @@ def main():
                         
                 else:
                     print("SLASH / null")
-            else c == '"':
+            elif c == '"':
                 word = ""
                 i += 1
                 while i < length and file_contents[i] != '"':
