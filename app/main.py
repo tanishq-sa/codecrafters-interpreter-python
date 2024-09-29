@@ -57,7 +57,7 @@ def scan(file_contents):
                     i += 1
                 else:
                     print("GREATER > null")
-            case "/"
+            case "/":
                 if i < length - 1 and file_contents[i + 1] == "/":
                     i += 1
                     while i < length and file_contents[i] != "\n":
